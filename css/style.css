@@ -207,6 +207,9 @@ color: #0D0F16;
   justify-content: center;
  
 }
+.myphoto{
+  border-radius: 10%;
+}
 /* home page button */
 
 .homeBtn {
