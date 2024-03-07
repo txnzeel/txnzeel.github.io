@@ -273,15 +273,15 @@ color: #0D0F16;
 }
 .item1 { grid-area: one;
    background-image: url(../img/project05.png);
-   
+   height: 250px;
 }
 .item2 {
   grid-area: two;
   background-image: url(../img/project02.png);
 }
-.item3 { grid-area: three; background-image: url(../img/project03.png); }
-.item4 { grid-area: four; background-image: url(../img/project04.png); }
-.item5 { grid-area: five; background-image: url(../img/project01.png);}
+
+.item5 { grid-area: three; background-image: url(../img/project01.png);
+width: 300%;}
 
 .project-grid {
 display: grid;
