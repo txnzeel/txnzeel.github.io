@@ -15,7 +15,10 @@ body{
   max-width: 85%;
 }
 .bg{
-  background-color: #FEF4F2;
+  background-color: #a0d2eb;
+}
+#purplebg{
+  background-color: #edf7f6;
 }
 .section{
   padding: 4rem 0;
@@ -52,12 +55,18 @@ color: #0D0F16;
 }
 /* navbar  */
 .navbar{
-  background-color: #FEF4F2 !important;   
+  background-color: #a0d2eb !important;   
   margin: 0 auto;
+  position: fixed;
+  left: 0;      /* ADDED */
+  top: 0;       /* ADDED */
+  width: 100%;  /* ADDED */
+  z-index: 1;
 }
 .navbar-brand{
   font-family: 'Brush Script MT', cursive;
-  font-size: 3.4rem;
+  font-size: 2.6rem;
+  padding-top: 6px;
   color: #0D0F16;
 }
 .navbar-collapse{
@@ -135,17 +144,17 @@ border: 0;
 a.my-cv {
   text-decoration: none;
   font-family: 'Montserrat', sans-serif;
-  color: #F87474;
+  color: #117821;
   font-size: 1.4rem;
   padding: 1.2rem 1.6rem;
-  border: .1rem solid #F87474;
+  border: .1rem solid #0a4a14;
   border-radius: .5rem;
-  background-color: #FEF4F2 !important;
+  background-color: #a0d2eb !important;
   /* transition: background .5s, border 0.5s, color 0.5s ease-in-out; Add a 0s transition for the specified properties */
 }
 
 a.my-cv:hover {
-  background: linear-gradient(90deg, rgba(79,1,1,1) 0%, rgba(242,79,79,1) 81%); /* Add your desired gradient colors */
+  background: linear-gradient(90deg, #298da6 0%, #3d4183c9 81%); /* Add your desired gradient colors */
   color: white;
   font-weight: 600;
   border: .1rem  solid white;
@@ -159,23 +168,16 @@ a.my-cv:hover {
 
 /* first-section */
 .first-section{
-  background-color: #FEF4F2;
+  background-color: #a0d2eb;
   padding-top: 9rem;
   
 }
-.title{
-  color:#F26C4F;
-  font-size: 1.6rem;
-  font-weight: 400;
-  font-family: 'Montserrat';
-  line-height: 2rem;
-}
 .intro .hi{
-  font-family: 'Montserrat';
+  font-family: 'Rouge Script',cursive;
 font-style: normal;
 font-weight: 800;
-font-size: 1.6rem;
-line-height: 3rem;
+font-size: 2.1rem;
+line-height: 2.5rem;
 color: #0D0F16;
 }
 .intro .my-name{
@@ -196,7 +198,7 @@ margin: 0 auto 2rem ;
 color: #0D0F16;
 }
 .intro .my-name span{
-  color: #F26C4F;
+  color: #117821;
 }
 .first-section img{
   max-width: 30rem;
@@ -208,7 +210,8 @@ color: #0D0F16;
  
 }
 .myphoto{
-  border-radius: 10%;
+  border-radius: 50%;
+  margin-bottom: 40px;
 }
 /* home page button */
 
@@ -219,8 +222,7 @@ color: #0D0F16;
   font-weight: 500;
   font-size: 1.4rem;
   color: white;
-  /* background: #F26C4F; */
-  background: linear-gradient(90deg, #F26C4F 0%, #F26C4F 81%);
+  background: linear-gradient(90deg, #117821 0%, #117821 81%);
   border-radius: .2rem;
   padding: .6rem 2rem;
   cursor: pointer;
@@ -237,19 +239,19 @@ color: #0D0F16;
 
 @keyframes animatedGradient{
   0%{
-    background: linear-gradient(90deg, #660303c9 0%, #e02929c9 81%);
+    background: linear-gradient(90deg, #298da6 0%, #3d4183c9 81%);
   }
   25%{
-    background: linear-gradient(90deg,  #660303da 0%, #e02929da 81%);
+    background: linear-gradient(90deg, #298da6 0%, #3d4183c9 81%);
   }
   50%{
-    background: linear-gradient(90deg,  #660303ec 0%, #e02929ec 81%);
+    background: linear-gradient(90deg, #298da6 0%, #3d4183c9 81%);
   }
   75%{
-    background: linear-gradient(90deg,  #660303ef 0%, #e02929ef 81%);
+    background: linear-gradient(90deg, #298da6 0%, #3d4183c9 81%);
   }
   100%{
-    background: linear-gradient(90deg,  #660303 0%, #e02929 81%);
+    background: linear-gradient(90deg, #298da6 0%, #3d4183c9 81%);
   }
 }
 
@@ -273,7 +275,7 @@ color: #0D0F16;
 }
 .item1 { grid-area: one;
    background-image: url(../img/project05.png);
-   height: 250px;
+   height: 200px;
 }
 .item2 {
   grid-area: two;
@@ -281,7 +283,7 @@ color: #0D0F16;
 }
 
 .item5 { grid-area: three; background-image: url(../img/project01.png);
-width: 300%;}
+width: 290%;}
 
 .project-grid {
 display: grid;
@@ -327,16 +329,16 @@ border-radius: 10px;
   color: #ececec;
   opacity: 0;
   transition: 0.7s;
-  background-color: #ff7777;
-  border: #F87474; 
+  background-color: #117821;
+  border: #0a4a14; 
 }
 
 .layer:hover a{
   opacity: 1;
 }
 .layer a:hover{
-  background-color: #f54343;
-  border: #F87474; 
+  background-color: #298da6;
+  border: #3d4183c9; 
 }
 
 /* services */
@@ -440,57 +442,11 @@ border-radius: 10px;
     grid-template-rows: repeat(6, 1fr);
 
   }
- 
-}
-/*
-.items{
- margin: 2rem auto;;
+ .myphoto{
+  margin-top: 20px;
+ }
 }
 
-.items img{
-  width: 3.5rem;
-}
-.items p{
-  font-weight: 500;
-}
-.skills{
-  display: flex;
-  justify-content: center;
-  flex-wrap: wrap;
-  align-items: center;
-  text-align: center;
- 
-}
-
-.skill{
-  width: 220px;
-  
-}
-
-.border1{
-  border-color:rgba(242, 108, 79, 0.5);
-  border-width: 0px 0px 1px 0px;
-  border-style: solid;
-}
-
-.border_bottom{
-  border-color:rgba(242, 108, 79, 0.5);
-  border-width: 0px 0px 1px 0px;
-  border-style: solid; 
-}
-.border_right, .border3{
- border-right: 1px solid rgba(242, 108, 79, 0.5); 
-}
-.border3, .border7{
-  border-left: 1px solid rgba(242, 108, 79, 0.5); 
-}
-.border10{
- border-right: 1px solid rgba(242, 108, 79, 0.5); 
-}
-
-*/
-
-/* ----------cta-------- */
 .pos-relative{
   position: relative;
 }
@@ -519,7 +475,7 @@ border-radius: 10px;
   font-weight: 500;
   font-size: 1.4rem;
   color: white;
-  background: #F26C4F;
+  background: #117821;
   border-radius: .2rem;
   padding: 1.2rem 1.6rem;
   margin-right: 2rem;
@@ -528,7 +484,7 @@ border-radius: 10px;
 }
 
 .About-section .homeBtn:hover {
-  background: linear-gradient(90deg, rgba(79,1,1,1) 0%, rgba(242,79,79,1) 81%) !important; ; /* Add your desired gradient colors */
+  background: linear-gradient(90deg, #298da6 0%, #3d4183c9 81%) !important; ; /* Add your desired gradient colors */
   color: white;
   font-weight: 500; 
 }
@@ -552,6 +508,7 @@ border-radius: 10px;
 }
 .social-media{
   margin-top: 4rem;
+  margin-bottom: 20px;
 }
 .social-media img{
   width: 40px;
@@ -573,7 +530,7 @@ border-radius: 10px;
 /* form design */
 input, textarea, button[type="submit"]{
   border-radius: 20px;
-  background: #FEF4F2;
+  background: #ffffff;
   border: 1px solid rgba(0, 0, 0, 0.2);
 
 }
@@ -622,8 +579,8 @@ line-height: 41px;
 color: rgba(41, 41, 41, 0.5);
 }
 button[type="submit"] {
-  background: #F87474;
-  border: 1px solid #F87474;
+  background: #117821;
+  border: 1px solid #0a4a14;
   border-radius: 20px;
   font-family: 'Nunito';
   font-style: normal;
@@ -637,7 +594,7 @@ button[type="submit"] {
 }
 
 button[type="submit"]:hover {
-  background: linear-gradient(90deg, rgba(79,1,1,1) 0%, rgba(242,79,79,1) 81%) !important; ; /* Add your desired gradient colors */
+  background: linear-gradient(90deg, #298da6 0%, #3d4183c9 81%) !important; ; /* Add your desired gradient colors */
   border: 1px solid #ffffff;
   color: rgb(255, 255, 255);
 }
@@ -645,7 +602,7 @@ button[type="submit"]:hover {
 /* footer */
 
 footer{
-  background-color: #FEF4F2;    
+  background-color: #a0d2eb;    
   /* flex-basis: 30%; */
 }
 .footer{
@@ -654,7 +611,7 @@ footer{
   flex-wrap: wrap;
 }
 .footer .navbar-brand:hover{
-  color: #ff7777;
+  color: #a0d2eb ;
 }
 .footer div{
   width: 32%;
@@ -739,7 +696,7 @@ a{
     content: "";
     display: block;
     /* vertical-align: middle; */
-    border-bottom: solid 10px #EA5D5F;
+    border-bottom: solid 10px #057a6d;
     border-left: solid 10px transparent;
     line-height: 0;
     border-right: solid 10px transparent;
@@ -809,7 +766,7 @@ a{
             font-size: 25px;
             text-align: center;
             font-family: "Inter", cursive;
-            color: #F26C4F;
+            color: #a0d2eb;
         }
 
         .pricing {
@@ -834,9 +791,9 @@ a{
 
         .button {
             margin-top: 9px;
-            border: 1px solid #F26C4F;
+            border: 1px solid #0a4a14;
             background-color: white;
-            color: #F26C4F;
+            color: #117821;
             border-radius: 5px;
             padding: 8px 18px;
             cursor: pointer;
@@ -889,11 +846,9 @@ a{
   }
   
   .navbar-brand{
-      font-size: 3.2rem;
+      font-size: 2.6rem;
   }
-  /* a.navbar-brand:hover{
-      color:  #F87474 !important;
-  } */
+ 
   .navbar-collapse{
       padding-bottom: 2rem;
       
@@ -937,8 +892,8 @@ a{
     }
     .layer a{
       opacity: 1;
-      background-color: #ff7777;
-      border: #F87474;
+      background-color: #117821;
+      border: #0a4a14;
     }
   /* skills */
 
