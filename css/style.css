@@ -337,6 +337,22 @@ border-radius: 10px;
   border: #3d4183c9; 
 }
 
+.notavailable{
+  font-size: 2rem;
+  font-family: "Prompt", sans-serif;
+  text-align: center;
+  padding-top: 15rem;
+  font-weight: 500;
+    cursor: default;
+  
+}
+.useconnect{
+  margin-bottom: -30px;
+  text-align: center;
+  font-size: 2rem;
+  font-family: "Caveat";
+}
+
 /* services */
 .service img{
   width: 3.5rem;
