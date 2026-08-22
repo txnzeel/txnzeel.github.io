@@ -229,6 +229,14 @@ const skillGroups = [
 const projects = [
   {
     index: "01",
+    title: "Customer Churn Early-Warning System",
+    desc: "End-to-end retention system on 7,043 telecom customers: SQL feature engineering, a Random Forest classifier (89% recall on high-risk churners, 0.86 ROC AUC), and a 4-page Power BI dashboard that surfaces ₹127K in monthly revenue at risk and an exportable retention action list.",
+    tags: ["SQL", "Python", "Scikit-learn", "Power BI", "DAX"],
+    metric: "89% recall · ₹127K/mo at risk",
+    href: "https://github.com/txnzeel/customer-churn-early-warning-system",
+  },
+  {
+    index: "02",
     title: "TR-InsightForge — AI-Powered BI Platform",
     desc: "Full-stack platform letting small business owners upload raw data and get instant revenue forecasts (ARIMA, MAPE ~5%), customer segments (RFM + K-Means), and a RAG business advisor grounded in Groq Llama 3.3-70B.",
     tags: ["React", "FastAPI", "MongoDB", "Pinecone", "Groq"],
@@ -236,7 +244,7 @@ const projects = [
     href: "#",
   },
   {
-    index: "02",
+    index: "03",
     title: "Kashmir Tourism Analytics",
     desc: "Power BI deep-dive into district-wise tourist footfall and seasonal patterns across J&K, flagging peak months (May–Sep) and under-visited 'hidden gem' districts for targeted off-season marketing.",
     tags: ["Power BI", "DAX", "Power Query"],
@@ -244,7 +252,7 @@ const projects = [
     href: "#",
   },
   {
-    index: "03",
+    index: "04",
     title: "Walmart Sales Performance",
     desc: "Interactive Power BI dashboard tracking MoM growth, regional profit margins, and category performance using CALCULATE and SAMEPERIODLASTYEAR with store-level drill-through.",
     tags: ["Power BI", "DAX", "Drill-through"],
@@ -252,7 +260,7 @@ const projects = [
     href: "#",
   },
   {
-    index: "04",
+    index: "05",
     title: "SQL Data Exploration",
     desc: "Deep-dives using window functions (RANK, ROW_NUMBER, LAG/LEAD), CTEs, and multi-table joins to solve real retention, lifetime-value, and top-category business questions.",
     tags: ["SQL", "Window Functions", "CTEs"],
@@ -473,39 +481,12 @@ export default function Portfolio() {
     if (el) el.scrollIntoView({ behavior: "smooth", block: "start" });
   };
 
- const handleSend = async (e) => {
-  e.preventDefault();
-
-  if (!formState.name || !formState.email || !formState.message) {
-    alert("Please fill in all fields.");
-    return;
-  }
-
-  try {
-    const response = await fetch("https://formspree.io/f/xnqevkpk", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        name: formState.name,
-        email: formState.email,
-        message: formState.message,
-      }),
-    });
-
-    if (response.ok) {
-      setSent(true);
-      setFormState({ name: "", email: "", message: "" });
-      setTimeout(() => setSent(false), 5000);
-    } else {
-      alert("Something went wrong. Please try again.");
-    }
-  } catch (error) {
-    console.error("Formspree error:", error);
-    alert("Something went wrong. Please try again.");
-  }
-};
+  const handleSend = () => {
+    if (!formState.name || !formState.email || !formState.message) return;
+    setSent(true);
+    setTimeout(() => setSent(false), 4000);
+    setFormState({ name: "", email: "", message: "" });
+  };
 
   const techStack = [
     "Power BI", "SQL", "Python", "ARIMA", "K-Means", "RAG",
@@ -520,33 +501,28 @@ export default function Portfolio() {
       <style>{`
         @import url('https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300..900;1,9..144,300..900&family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap');
 
-        /* ----- PERMANENT DARK MODE ----- */
-        :root {
-          --paper: #121212;
-          --ink: #F3F1E9;
-          --ink-soft: #A8A69C;
-          --panel: #1E1E1E;
-          --line: #333333;
-          --navy: #0A0A0A;
-          --navy-soft: #888888;
-          --navy-line: rgba(255,255,255,0.06);
-          --shadow: 0 16px 32px rgba(0,0,0,0.6);
-          --glow: rgba(200,132,43,0.4);
-          --amber: #C8842B;
-          --amber-soft: rgba(200,132,43,0.12);
-          --teal: #2F6B66;
-        }
-
         html, body, #root {
           margin: 0;
           padding: 0;
           min-height: 100vh;
           background: var(--paper);
           scroll-behavior: smooth;
-          color: var(--ink);
         }
 
         .ta-root {
+          --paper: #121212;
+          --ink: #F3F1E9;
+          --ink-soft: #A8A69C;
+          --panel: #1E1E1E;
+          --line: #333333;
+          --amber: #C8842B;
+          --amber-soft: rgba(200,132,43,0.12);
+          --teal: #4FA89F;
+          --navy: #0A0A0A;
+          --navy-soft: #888888;
+          --navy-line: rgba(255,255,255,0.06);
+          --glow: rgba(200,132,43,0.4);
+          --shadow: 0 16px 32px rgba(0,0,0,0.6);
           font-family: 'IBM Plex Sans', sans-serif;
           color: var(--ink);
           background: var(--paper);
@@ -591,7 +567,7 @@ export default function Portfolio() {
           font-size: 12px;
           letter-spacing: 0.14em;
           text-transform: uppercase;
-          color: #E3B06B;
+          color: var(--amber);
           display: flex;
           align-items: center;
           gap: 10px;
@@ -601,9 +577,10 @@ export default function Portfolio() {
           content: "";
           width: 22px;
           height: 1px;
-          background: #E3B06B;
+          background: var(--amber);
           transition: width 0.3s ease;
         }
+        .ta-eyebrow.on-dark { color: #E3B06B; }
 
         /* ----- NAV ----- */
         .ta-nav {
@@ -697,8 +674,13 @@ export default function Portfolio() {
 
         /* ----- HERO ----- */
         .ta-hero {
-          background: transparent !important;
+          background: var(--navy);
+          color: var(--navy-soft);
+          background-image:
+            repeating-linear-gradient(0deg, var(--navy-line) 0px, var(--navy-line) 1px, transparent 1px, transparent 64px),
+            repeating-linear-gradient(90deg, var(--navy-line) 0px, var(--navy-line) 1px, transparent 1px, transparent 64px);
           position: relative;
+          overflow: hidden;
           min-height: 100vh;
           will-change: transform;
         }
@@ -713,7 +695,7 @@ export default function Portfolio() {
           align-items: center;
           position: relative;
           z-index: 1;
-          background: rgba(0, 0, 0, 0.35);
+          background: rgba(0, 0, 0, 0.3);
           border-radius: 16px;
           will-change: transform;
           contain: layout style paint;
@@ -930,7 +912,7 @@ export default function Portfolio() {
         .ta-stat-value { font-size: 16px; color: #F3F1E9; font-weight: 600; }
 
         .ta-marquee-wrapper {
-          background: #1E1E1E;
+          background: var(--line);
           padding: 12px 0;
           overflow: hidden;
           border-top: 1px solid var(--line);
@@ -968,10 +950,37 @@ export default function Portfolio() {
         .ta-section-inner { max-width: 1180px; margin: 0 auto; }
         .ta-section.on-paper { background: transparent !important; padding: 64px 28px; }
 
+        /* 🔥 KEY OPTIMIZATION: Static frosted glass (NO backdrop-filter) */
         .ta-section.on-paper .ta-section-inner {
-          background: rgba(0, 0, 0, 0.45);
+          background: rgba(255, 255, 255, 0.08);
           border-radius: 32px;
           padding: 60px 48px;
+          border: 1px solid rgba(255, 255, 255, 0.05);
+          box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+          background: rgba(0, 0, 0, 0.55);
+          transition: background 0.4s ease, border-color 0.4s ease, box-shadow 0.4s ease;
+          will-change: transform;
+          contain: layout style paint;
+        }
+
+        /* ----- Hero transparent so cubes show through ----- */
+        .ta-hero {
+          background: transparent !important;
+        }
+        .ta-hero-inner {
+          background: rgba(0, 0, 0, 0.35) !important;
+          backdrop-filter: blur(2px);
+          -webkit-backdrop-filter: blur(2px);
+        }
+
+        /* ----- Contact transparent so cubes show through ----- */
+        .ta-contact {
+          background: transparent !important;
+        }
+        .ta-contact .ta-contact-grid {
+          background: rgba(0, 0, 0, 0.55);
+          border-radius: 32px;
+          padding: 48px 40px;
           border: 1px solid rgba(255, 255, 255, 0.05);
           box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
           transition: background 0.4s ease, border-color 0.4s ease, box-shadow 0.4s ease;
@@ -991,14 +1000,14 @@ export default function Portfolio() {
         }
 
         .ta-section-head { max-width: 620px; margin-bottom: 56px; }
-        .ta-h2 { font-size: clamp(28px, 3.4vw, 40px); font-weight: 500; margin: 0 0 14px; line-height: 1.16; color: #F3F1E9; }
+        .ta-h2 { font-size: clamp(28px, 3.4vw, 40px); font-weight: 500; margin: 0 0 14px; line-height: 1.16; }
         .ta-h2-sub { font-size: 15.5px; color: var(--ink-soft); line-height: 1.6; margin: 0; }
 
         .ta-services-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1px; background: var(--line); border: 1px solid var(--line); }
         .ta-service-card { background: var(--panel); padding: 34px 28px; transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1); position: relative; z-index: 1; border-left: 3px solid transparent; will-change: transform; }
         .ta-service-card:hover { transform: translateY(-8px) scale(1.02); box-shadow: 0 20px 40px var(--shadow); border-left-color: var(--amber); background: var(--panel); }
         .ta-service-num { font-family: 'IBM Plex Mono', monospace; font-size: 12px; color: var(--amber); margin-bottom: 22px; }
-        .ta-service-card h3 { font-family: 'Fraunces', serif; font-size: 21px; font-weight: 500; margin: 0 0 12px; color: #F3F1E9; }
+        .ta-service-card h3 { font-family: 'Fraunces', serif; font-size: 21px; font-weight: 500; margin: 0 0 12px; }
         .ta-service-card p { font-size: 14.5px; color: var(--ink-soft); line-height: 1.65; margin: 0; }
 
         .ta-skills-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 48px 52px; }
@@ -1026,7 +1035,7 @@ export default function Portfolio() {
         }
         .ta-project-row:last-child { border-bottom: 1px solid var(--line); }
         .ta-project-index { font-family: 'IBM Plex Mono', monospace; font-size: 13px; color: var(--amber); padding-top: 4px; }
-        .ta-project-title { font-family: 'Fraunces', serif; font-size: 21px; font-weight: 500; margin: 0 0 10px; color: #F3F1E9; }
+        .ta-project-title { font-family: 'Fraunces', serif; font-size: 21px; font-weight: 500; margin: 0 0 10px; }
         .ta-project-desc { font-size: 14px; color: var(--ink-soft); line-height: 1.65; margin: 0; max-width: 480px; }
         .ta-project-meta { display: flex; flex-direction: column; gap: 14px; align-items: flex-start; }
         .ta-project-tags { display: flex; flex-wrap: wrap; gap: 8px; }
@@ -1064,21 +1073,8 @@ export default function Portfolio() {
         .ta-edu-school { color: var(--ink-soft); font-family: 'IBM Plex Sans', sans-serif; font-size: 13px; }
         .ta-edu-score { color: var(--teal); }
 
-        .ta-contact {
-          background: transparent !important;
-        }
-        .ta-contact-grid {
-          display: grid;
-          grid-template-columns: 0.8fr 1.2fr;
-          gap: 60px;
-          background: rgba(0, 0, 0, 0.45);
-          border-radius: 32px;
-          padding: 48px 40px;
-          border: 1px solid rgba(255, 255, 255, 0.05);
-          box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
-          will-change: transform;
-          contain: layout style paint;
-        }
+        .ta-contact { background: var(--navy); color: var(--navy-soft); }
+        .ta-contact-grid { display: grid; grid-template-columns: 0.8fr 1.2fr; gap: 60px; }
         .ta-contact .ta-h2 { color: #F3F1E9; }
         .ta-contact-email { display: inline-flex; align-items: center; gap: 10px; font-family: 'IBM Plex Mono', monospace; font-size: 16px; color: #F3F1E9; text-decoration: none; padding-bottom: 4px; border-bottom: 1px solid var(--navy-line); margin: 22px 0 18px; transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1); }
         .ta-contact-email:hover { border-color: var(--amber); color: var(--amber); transform: translateX(4px); }
@@ -1118,9 +1114,6 @@ export default function Portfolio() {
           .ta-section.on-paper .ta-section-inner {
             padding: 32px 20px;
           }
-          .ta-contact-grid {
-            padding: 32px 20px;
-          }
         }
 
         @media (prefers-reduced-motion: reduce) {
@@ -1133,7 +1126,7 @@ export default function Portfolio() {
         }
       `}</style>
 
-      {/* 🟢 3D BACKGROUND - RENDERS BEHIND EVERYTHING */}
+              {/* 3D BACKGROUND - RENDERS BEHIND EVERYTHING */}
       {!isMobile && <ThreeBackground />}
 
       <ScrollProgress />
@@ -1184,6 +1177,7 @@ export default function Portfolio() {
 
       {/* HERO */}
       <header className="ta-hero" id="home">
+        
         <div className="ta-hero-inner">
           <div>
             <p className={`ta-hi ta-hero-fade ${mounted ? "show" : ""}`}>
@@ -1203,7 +1197,7 @@ export default function Portfolio() {
             <div className={`ta-location-row ta-hero-fade ${mounted ? "show" : ""}`} style={{ transitionDelay: "0.15s" }}>
               <span><MapPin size={13} /> {person.location}</span>
               <span><Phone size={13} /> {person.phone}</span>
-              <span><Activity size={13} /> 8 projects delivered</span>
+              <span><Activity size={13} /> 9 projects delivered</span>
             </div>
             <div className={`ta-cta-row ta-hero-fade ${mounted ? "show" : ""}`} style={{ transitionDelay: "0.18s" }}>
               <button className="ta-btn-primary" onClick={() => handleNav("#projects")}>
@@ -1334,7 +1328,7 @@ export default function Portfolio() {
       </section>
 
       {/* SKILLS */}
-      <section className="ta-section on-paper" id="skills">
+      <section className="ta-section on-paper" id="skills" style={{ background: "var(--paper)" }}>
         <div className="ta-section-inner">
           <Reveal className="ta-section-head">
             <p className="ta-eyebrow">02 — TOOLKIT</p>
@@ -1389,7 +1383,7 @@ export default function Portfolio() {
       </section>
 
       {/* ABOUT */}
-      <section className="ta-section on-paper" id="about">
+      <section className="ta-section on-paper" id="about" style={{ background: "var(--paper)" }}>
         <div className="ta-section-inner">
           <Reveal className="ta-section-head">
             <p className="ta-eyebrow">04 — ABOUT</p>
@@ -1446,7 +1440,7 @@ export default function Portfolio() {
         <div className="ta-section-inner">
           <div className="ta-contact-grid">
             <Reveal>
-              <p className="ta-eyebrow on-dark" style={{ color: "#E3B06B" }}>05 — GET IN TOUCH</p>
+              <p className="ta-eyebrow on-dark">05 — GET IN TOUCH</p>
               <h2 className="ta-h2 ta-serif">Let's talk data.</h2>
               <p className="ta-h2-sub" style={{ color: "var(--navy-soft)" }}>
                 Have a dataset that needs a story, or a dashboard that needs building? I'm a click away.
