@@ -1150,9 +1150,12 @@ export default function Portfolio() {
             ))}
           </ul>
           <div className="ta-nav-right">
-            <a className="ta-resume-btn" href="cv/CV.pdf" download>
-              Get resume <ArrowUpRight size={14} />
-            </a>
+<a
+  className="ta-resume-btn"
+  href={`${import.meta.env.BASE_URL}Resume.pdf`}
+  download>
+  Get resume <ArrowUpRight size={14} />
+</a>
             <button className="ta-burger" onClick={() => setMenuOpen((v) => !v)} aria-label="Toggle menu">
               {menuOpen ? <X size={22} /> : <Menu size={22} />}
             </button>
@@ -1162,7 +1165,15 @@ export default function Portfolio() {
           {navLinks.map((l) => (
             <button key={l.href} onClick={() => handleNav(l.href)}>{l.label}</button>
           ))}
-          <a href="cv/CV.pdf" download style={{ padding: "12px 0", display: "block", color: "var(--amber)" }}>Get resume</a>
+<a
+  href={`${import.meta.env.BASE_URL}Resume.pdf`}
+  download
+  style={{
+    padding: "12px 0",
+    display: "block",
+    color: "var(--amber)"
+  }}>
+  Get resume</a>
         </div>
       </nav>
 
@@ -1422,7 +1433,12 @@ export default function Portfolio() {
 
               <div className="ta-about-actions">
                 <a className="ta-btn-dark" href="mailto:tanzeelq@gmail.com">Hire me <ArrowRight size={15} /></a>
-                <a className="ta-btn-outline" href="cv/CV.pdf" download>Download CV</a>
+                <a
+              className="ta-btn-outline"
+              href={`${import.meta.env.BASE_URL}Resume.pdf`}
+              download>
+              Download CV
+              </a>
               </div>
             </Reveal>
             <Reveal delay={0.1}>
