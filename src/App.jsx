@@ -227,14 +227,19 @@ const skillGroups = [
 ];
 
 const projects = [
-  {
-    index: "01",
-    title: "Customer Churn Early-Warning System",
-    desc: "End-to-end retention system on 7,043 telecom customers: SQL feature engineering, a Random Forest classifier (89% recall on high-risk churners, 0.86 ROC AUC), and a 4-page Power BI dashboard that surfaces ₹127K in monthly revenue at risk and an exportable retention action list.",
-    tags: ["SQL", "Python", "Scikit-learn", "Power BI", "DAX"],
-    metric: "89% recall · ₹127K/mo at risk",
-    href: "https://github.com/txnzeel/customer-churn-early-warning-system",
-  },
+ {
+  index: "01",
+
+  title: "Customer Churn Early-Warning System",
+
+  desc: "End-to-end customer retention system built on 7,043 telecom customers: a Random Forest classifier achieving 0.828 ROC-AUC, SHAP-based churn explanations, revenue-at-risk analysis, and an interactive Streamlit dashboard for customer risk scoring and retention prioritization.",
+
+  tags: ["Python", "Scikit-learn", "Random Forest", "SHAP", "Streamlit", "Plotly"],
+
+  metric: "0.828 ROC-AUC · 832 high-risk customers",
+
+  href: "https://github.com/txnzeel/customer-churn-early-warning-system",
+},,
   {
     index: "02",
     title: "TR-InsightForge — AI-Powered BI Platform",
@@ -1231,7 +1236,7 @@ export default function Portfolio() {
             <div className="ta-panel">
               <div className="ta-panel-head">
                 <span className="ta-panel-title">⚡ OPS COMMAND CENTER</span>
-                <span className="ta-live"><span className="ta-live-dot" /> LIVE</span>
+                <span className="ta-live"><span className="ta-live-dot" /> ANALYTICS DEMO</span>
               </div>
 
               <div className="ta-chart-controls">
@@ -1387,9 +1392,6 @@ export default function Portfolio() {
               </Reveal>
             ))}
           </div>
-          <Reveal>
-            <p className="ta-projects-note">GitHub &amp; Power BI dashboards available on request · live demo available for TR-InsightForge.</p>
-          </Reveal>
         </div>
       </section>
 
