@@ -281,7 +281,7 @@ const projects = [
     desc: "Full-stack platform letting small business owners upload raw data and get instant revenue forecasts (ARIMA, MAPE ~5%), customer segments (RFM + K-Means), and a RAG business advisor grounded in Groq Llama 3.3-70B.",
     tags: ["React", "FastAPI", "MongoDB", "Pinecone", "Groq"],
     metric: "~5% MAPE · RAG advisor",
-    href: "#",
+    href: "https://github.com/rizwanbashiir/TR-Insight-forge",
   },
 ];
 
@@ -1488,7 +1488,7 @@ export default function Portfolio() {
               <div className="ta-social-row">
                 <a href="https://www.linkedin.com/in/txnzeel/" target="_blank" rel="noreferrer" aria-label="LinkedIn"><Linkedin size={17} /></a>
                 <a href="https://github.com/txnzeel" target="_blank" rel="noreferrer" aria-label="GitHub"><Github size={17} /></a>
-                <a href="https://twitter.com/txnzeelo" target="_blank" rel="noreferrer" aria-label="Twitter"><Twitter size={17} /></a>
+                <a href="https://twitter.com/9o9zeel" target="_blank" rel="noreferrer" aria-label="Twitter"><Twitter size={17} /></a>
               </div>
             </Reveal>
             <Reveal delay={0.1}>
