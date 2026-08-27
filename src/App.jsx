@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect, useRef, useMemo } from "react";
 import {
   AreaChart,
   Area,
@@ -30,6 +30,7 @@ import {
 
 // --- Three.js Imports for 3D Background ---
 import { Canvas, useFrame } from "@react-three/fiber";
+import * as THREE from "three";
 
 /* ---------- SVGs for Socials ---------- */
 function Github({ size = 17, color = "currentColor" }) {
@@ -55,10 +56,13 @@ function Twitter({ size = 17, color = "currentColor" }) {
 }
 
 /* ---------- PEACEFUL DATA CLUSTER (Automatic Breathing) ---------- */
-function DataCluster() {
-  const groupRef = useRef();
+function DataCluster({ animate = true }) {
+  const meshRef = useRef();
+  const dummy = useMemo(() => new THREE.Object3D(), []);
 
-  const count = 80;
+  // One instanced mesh replaces dozens of individual draw calls while
+  // preserving the same clustered-cube appearance.
+  const count = 48;
   const positions = useRef(
     Array.from({ length: count }, () => {
       const theta = Math.random() * Math.PI * 2;
@@ -72,57 +76,75 @@ function DataCluster() {
     })
   );
 
-  const colors = ["#C8842B", "#2F6B66", "#2ecc71", "#e67e22", "#3498db", "#F3F1E9"];
+  const colors = useMemo(
+    () => ["#C8842B", "#2F6B66", "#2ecc71", "#e67e22", "#3498db", "#F3F1E9"],
+    []
+  );
 
-  useFrame((state) => {
-    const time = state.clock.getElapsedTime();
-    if (groupRef.current) {
-      // Slow rotation
-      groupRef.current.rotation.y += 0.002;
-      groupRef.current.rotation.x = Math.sin(time * 0.08) * 0.05;
+  useEffect(() => {
+    if (!meshRef.current) return;
 
-      // AUTOMATIC BREATHING: pulses between 1.0 and 2.2 every 4 seconds
-      const breathe = 1.4 + Math.sin(time * 0.4) * 0.6;
+    meshRef.current.instanceMatrix.setUsage(THREE.DynamicDrawUsage);
+    positions.current.forEach((_, index) => {
+      meshRef.current.setColorAt(index, new THREE.Color(colors[index % colors.length]));
+    });
 
-      groupRef.current.children.forEach((child, i) => {
-        if (i >= positions.current.length) return;
-        const base = positions.current[i];
-        child.position.set(
-          base[0] * breathe,
-          base[1] * breathe,
-          base[2] * breathe
-        );
-        // Size also breathes slightly
-        const size = 0.06 + (Math.sin(time * 0.3 + i) * 0.02 + 0.02);
-        child.scale.setScalar(size);
-      });
+    if (meshRef.current.instanceColor) {
+      meshRef.current.instanceColor.needsUpdate = true;
     }
+  }, [colors]);
+
+  useFrame((state, delta) => {
+    if (!meshRef.current || document.hidden) return;
+
+    const time = animate ? state.clock.getElapsedTime() : 0;
+    const breathe = animate ? 1.4 + Math.sin(time * 0.4) * 0.6 : 1.4;
+
+    meshRef.current.rotation.y = animate
+      ? meshRef.current.rotation.y + Math.min(delta, 0.05) * 0.12
+      : 0;
+    meshRef.current.rotation.x = animate ? Math.sin(time * 0.08) * 0.05 : 0;
+
+    positions.current.forEach((base, index) => {
+      dummy.position.set(
+        base[0] * breathe,
+        base[1] * breathe,
+        base[2] * breathe
+      );
+      const size = animate
+        ? 0.08 + Math.sin(time * 0.3 + index) * 0.02
+        : 0.08;
+      dummy.scale.setScalar(size);
+      dummy.rotation.set(index * 0.07, index * 0.11, index * 0.05);
+      dummy.updateMatrix();
+      meshRef.current.setMatrixAt(index, dummy.matrix);
+    });
+
+    meshRef.current.instanceMatrix.needsUpdate = true;
   });
 
   return (
-    <group ref={groupRef}>
-      {positions.current.map((pos, i) => {
-        const color = colors[i % colors.length];
-        return (
-          <mesh key={i} position={[pos[0], pos[1], pos[2]]}>
-            <boxGeometry args={[1, 1, 1]} />
-            <meshStandardMaterial
-              color={color}
-              emissive={color}
-              emissiveIntensity={0.1}
-              roughness={0.3}
-              metalness={0.6}
-            />
-          </mesh>
-        );
-      })}
-    </group>
+    <instancedMesh ref={meshRef} args={[null, null, count]} frustumCulled={false}>
+      <boxGeometry args={[1, 1, 1]} />
+      <meshBasicMaterial vertexColors toneMapped={false} />
+    </instancedMesh>
   );
 }
 
 function ThreeBackground() {
+  const [reducedMotion, setReducedMotion] = useState(false);
+
+  useEffect(() => {
+    const media = window.matchMedia("(prefers-reduced-motion: reduce)");
+    const updatePreference = () => setReducedMotion(media.matches);
+    updatePreference();
+    media.addEventListener("change", updatePreference);
+    return () => media.removeEventListener("change", updatePreference);
+  }, []);
+
   return (
     <div
+      className="ta-three-background"
       style={{
         position: "fixed",
         top: 0,
@@ -136,13 +158,18 @@ function ThreeBackground() {
       <Canvas
         camera={{ position: [0, 0, 3.2] }}
         dpr={[1, 1]}
+        frameloop={reducedMotion ? "demand" : "always"}
+        flat
+        gl={{
+          antialias: false,
+          alpha: true,
+          powerPreference: "high-performance",
+          precision: "mediump",
+        }}
         performance={{ min: 0.5 }}
         style={{ width: "100%", height: "100%" }}
       >
-        <ambientLight intensity={0.6} />
-        <pointLight position={[5, 5, 5]} intensity={1.5} color="#C8842B" />
-        <pointLight position={[-5, -5, -5]} intensity={0.8} color="#2F6B66" />
-        <DataCluster />
+        <DataCluster animate={!reducedMotion} />
       </Canvas>
     </div>
   );
@@ -195,81 +222,65 @@ const heroStats = [
 
 const skillGroups = [
   {
-    label: "BI & Visualization",
+    label: "Analytics & BI",
     skills: [
-      { name: "Power BI (DAX, Power Query)", level: 85, icon: BarChart3 },
-      { name: "Advanced Excel (Macros, Pivot Tables)", level: 88, icon: Table2 },
+      { name: "Power BI", detail: "DAX · Power Query · Executive dashboards", icon: BarChart3 },
+      { name: "Advanced Excel", detail: "Macros · PivotTables · Reporting automation", icon: Table2 },
+      { name: "Business analytics", detail: "KPI design · Root-cause analysis · Decision support", icon: Activity },
     ],
   },
   {
-    label: "Database & Code",
+    label: "Data Engineering & SQL",
     skills: [
-      { name: "SQL (Window Functions, CTEs)", level: 90, icon: Database },
-      { name: "Python (Pandas, Matplotlib)", level: 80, icon: Code2 },
+      { name: "SQL", detail: "CTEs · Window functions · Complex joins · Data validation", icon: Database },
+      { name: "Python", detail: "Pandas · NumPy · Modular pipelines · Automation", icon: Code2 },
+      { name: "Data pipelines", detail: "ETL orchestration · Quality checks · Metadata logging", icon: Shuffle },
+      { name: "DuckDB", detail: "Analytical warehouse · Query-ready data models", icon: Database },
     ],
   },
   {
-    label: "AI & Machine Learning",
+    label: "Forecasting & Machine Learning",
     skills: [
-      { name: "ARIMA Forecasting", level: 76, icon: TrendingUp },
-      { name: "RFM & K-Means Segmentation", level: 78, icon: PieChartIcon },
-      { name: "RAG (Groq + Pinecone)", level: 70, icon: Sigma },
+      { name: "Demand forecasting", detail: "Time series · Forecast evaluation · MAPE", icon: TrendingUp },
+      { name: "Predictive modeling", detail: "Random Forest · Scikit-learn · Threshold tuning", icon: PieChartIcon },
+      { name: "Model explainability", detail: "SHAP · Feature importance · Risk scoring", icon: Sigma },
+      { name: "Segmentation", detail: "RFM · K-Means · Customer profiling", icon: PieChartIcon },
     ],
   },
   {
-    label: "Cloud & Deploy",
+    label: "Optimization & Applications",
     skills: [
-      { name: "Vercel", level: 74, icon: Cloud },
-      { name: "Railway", level: 68, icon: Server },
-      { name: "MongoDB Atlas", level: 72, icon: Database },
+      { name: "Inventory optimization", detail: "Safety stock · Reorder points · Service-cost trade-offs", icon: Sigma },
+      { name: "Scenario analysis", detail: "Economic validation · Contingency planning · Risk analysis", icon: TrendingUp },
+      { name: "Analytics apps", detail: "Streamlit · Plotly · React · FastAPI", icon: Cloud },
+      { name: "AI & cloud", detail: "RAG · Pinecone · Groq · MongoDB Atlas", icon: Server },
     ],
   },
 ];
 
 const projects = [
- {
+  {
   index: "01",
-
-  title: "Customer Churn Early-Warning System",
-
-  desc: "End-to-end customer retention system built on 7,043 telecom customers: a Random Forest classifier achieving 0.828 ROC-AUC, SHAP-based churn explanations, revenue-at-risk analysis, and an interactive Streamlit dashboard for customer risk scoring and retention prioritization.",
-
-  tags: ["Python", "Scikit-learn", "Random Forest", "SHAP", "Streamlit", "Plotly"],
-
-  metric: "0.828 ROC-AUC · 832 high-risk customers",
-
-  href: "https://github.com/txnzeel/customer-churn-early-warning-system",
-},,
+    title: "Supply Chain Intelligence & Demand Optimization",
+    desc: "Production-style analytics system covering 2,000 products and 1.46M daily demand records. It orchestrates data generation, quality validation, demand forecasting, inventory optimization, economic reconciliation, contingency planning, executive actions, risk intelligence, and a DuckDB analytical warehouse.",
+    tags: ["Python", "Pandas", "Forecasting", "Inventory Optimization", "DuckDB", "Data Quality"],
+    metric: "1.46M records · 2,000 SKUs · End-to-end pipeline",
+    href: "https://github.com/txnzeel/supply-chain-intelligence",
+  },
   {
     index: "02",
+    title: "Customer Churn Early-Warning System",
+    desc: "End-to-end customer retention system built on 7,043 telecom customers: a Random Forest classifier achieving 0.828 ROC-AUC, SHAP-based churn explanations, revenue-at-risk analysis, and an interactive Streamlit dashboard for customer risk scoring and retention prioritization.",
+    tags: ["Python", "Scikit-learn", "Random Forest", "SHAP", "Streamlit", "Plotly"],
+    metric: "0.828 ROC-AUC · 832 high-risk customers",
+    href: "https://github.com/txnzeel/customer-churn-early-warning-system",
+  },
+  {
+    index: "03",
     title: "TR-InsightForge — AI-Powered BI Platform",
     desc: "Full-stack platform letting small business owners upload raw data and get instant revenue forecasts (ARIMA, MAPE ~5%), customer segments (RFM + K-Means), and a RAG business advisor grounded in Groq Llama 3.3-70B.",
     tags: ["React", "FastAPI", "MongoDB", "Pinecone", "Groq"],
     metric: "~5% MAPE · RAG advisor",
-    href: "#",
-  },
-  {
-    index: "03",
-    title: "Kashmir Tourism Analytics",
-    desc: "Power BI deep-dive into district-wise tourist footfall and seasonal patterns across J&K, flagging peak months (May–Sep) and under-visited 'hidden gem' districts for targeted off-season marketing.",
-    tags: ["Power BI", "DAX", "Power Query"],
-    metric: "Peak season flagged",
-    href: "#",
-  },
-  {
-    index: "04",
-    title: "Walmart Sales Performance",
-    desc: "Interactive Power BI dashboard tracking MoM growth, regional profit margins, and category performance using CALCULATE and SAMEPERIODLASTYEAR with store-level drill-through.",
-    tags: ["Power BI", "DAX", "Drill-through"],
-    metric: "Store-level drill-through",
-    href: "#",
-  },
-  {
-    index: "05",
-    title: "SQL Data Exploration",
-    desc: "Deep-dives using window functions (RANK, ROW_NUMBER, LAG/LEAD), CTEs, and multi-table joins to solve real retention, lifetime-value, and top-category business questions.",
-    tags: ["SQL", "Window Functions", "CTEs"],
-    metric: "RANK · LAG/LEAD · CTEs",
     href: "#",
   },
 ];
@@ -367,18 +378,13 @@ function CountUp({ target, duration = 1300, prefix = "", suffix = "", decimals =
 }
 
 function SkillRow({ skill }) {
-  const [ref, inView] = useInView(0.3);
   const Icon = skill.icon;
   return (
-    <div className="ta-skill-row" ref={ref}>
-      <div className="ta-skill-top">
-        <span className="ta-skill-name"><Icon size={15} color="#2F6B66" /> {skill.name}</span>
-        <span className="ta-skill-pct">
-          {inView ? <CountUp target={skill.level} duration={1000} suffix="%" /> : "0%"}
-        </span>
-      </div>
-      <div className="ta-skill-track">
-        <div className="ta-skill-fill" style={{ width: inView ? `${skill.level}%` : "0%" }} />
+    <div className="ta-skill-row">
+      <span className="ta-skill-icon"><Icon size={16} /></span>
+      <div>
+        <div className="ta-skill-name">{skill.name}</div>
+        <div className="ta-skill-detail">{skill.detail}</div>
       </div>
     </div>
   );
@@ -494,9 +500,9 @@ export default function Portfolio() {
   };
 
   const techStack = [
-    "Power BI", "SQL", "Python", "ARIMA", "K-Means", "RAG",
-    "DAX", "ETL", "Pandas", "FastAPI", "MongoDB", "Pinecone",
-    "Groq", "React", "Vercel", "Railway"
+    "Power BI", "SQL", "Python", "Pandas", "DuckDB", "Data Quality",
+    "Demand Forecasting", "Inventory Optimization", "Scikit-learn", "SHAP",
+    "DAX", "ETL", "Streamlit", "FastAPI", "RAG", "React"
   ];
 
   const latestValue = chartData.length > 0 ? chartData[chartData.length - 1].v : 0;
@@ -592,9 +598,7 @@ export default function Portfolio() {
           position: sticky;
           top: 0;
           z-index: 50;
-          background: rgba(18,18,18,0.92);
-          backdrop-filter: blur(12px);
-          -webkit-backdrop-filter: blur(12px);
+          background: rgba(18,18,18,0.98);
           border-bottom: 1px solid var(--line);
           transition: background 0.4s ease, border-color 0.4s ease;
         }
@@ -687,7 +691,7 @@ export default function Portfolio() {
           position: relative;
           overflow: hidden;
           min-height: 100vh;
-          will-change: transform;
+          isolation: isolate;
         }
 
         .ta-hero-inner {
@@ -702,7 +706,6 @@ export default function Portfolio() {
           z-index: 1;
           background: rgba(0, 0, 0, 0.3);
           border-radius: 16px;
-          will-change: transform;
           contain: layout style paint;
         }
 
@@ -973,9 +976,15 @@ export default function Portfolio() {
           background: transparent !important;
         }
         .ta-hero-inner {
-          background: rgba(0, 0, 0, 0.35) !important;
-          backdrop-filter: blur(2px);
-          -webkit-backdrop-filter: blur(2px);
+          background: linear-gradient(
+            135deg,
+            rgba(4, 9, 18, 0.74),
+            rgba(4, 9, 18, 0.52)
+          ) !important;
+        }
+
+        @media (max-width: 768px) {
+          .ta-three-background { display: none !important; }
         }
 
         /* ----- Contact transparent so cubes show through ----- */
@@ -1015,14 +1024,14 @@ export default function Portfolio() {
         .ta-service-card h3 { font-family: 'Fraunces', serif; font-size: 21px; font-weight: 500; margin: 0 0 12px; }
         .ta-service-card p { font-size: 14.5px; color: var(--ink-soft); line-height: 1.65; margin: 0; }
 
-        .ta-skills-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 48px 52px; }
+        .ta-skills-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 28px; }
+        .ta-skills-grid > div { border: 1px solid var(--line); background: rgba(255,255,255,0.025); padding: 26px; border-radius: 14px; }
         .ta-skill-group-label { font-family: 'IBM Plex Mono', monospace; font-size: 12.5px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--ink-soft); margin-bottom: 22px; padding-bottom: 12px; border-bottom: 1px solid var(--line); }
-        .ta-skill-row { margin-bottom: 22px; }
-        .ta-skill-top { display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px; }
-        .ta-skill-name { display: flex; align-items: center; gap: 9px; font-size: 14.5px; color: var(--ink); }
-        .ta-skill-pct { font-family: 'IBM Plex Mono', monospace; font-size: 12.5px; color: var(--ink-soft); }
-        .ta-skill-track { height: 5px; background: var(--line); position: relative; overflow: hidden; border-radius: 4px; }
-        .ta-skill-fill { height: 100%; background: var(--teal); width: 0; transition: width 1.5s cubic-bezier(0.25, 0.46, 0.45, 0.94); border-radius: 4px; }
+        .ta-skill-row { display: grid; grid-template-columns: 34px 1fr; gap: 12px; align-items: start; margin-bottom: 18px; }
+        .ta-skill-row:last-child { margin-bottom: 0; }
+        .ta-skill-icon { width: 32px; height: 32px; display: inline-flex; align-items: center; justify-content: center; color: var(--teal); border: 1px solid var(--line); background: rgba(79,168,159,0.08); border-radius: 8px; }
+        .ta-skill-name { font-size: 14.5px; font-weight: 600; color: var(--ink); margin: 1px 0 4px; }
+        .ta-skill-detail { font-size: 12.5px; line-height: 1.5; color: var(--ink-soft); }
 
         .ta-projects-list { display: flex; flex-direction: column; }
         .ta-project-row {
@@ -1123,7 +1132,6 @@ export default function Portfolio() {
 
         @media (prefers-reduced-motion: reduce) {
           .ta-hero-fade, .ta-reveal { transition: none; opacity: 1; transform: none; }
-          .ta-skill-fill { transition: none; }
           .ta-live-dot, .ta-marquee-track { animation: none; }
           .ta-btn-primary::after { display: none; }
           .ta-chart-latest-value.pulse { animation: none; }
@@ -1207,13 +1215,13 @@ export default function Portfolio() {
               your <span className="ta-typing">{roles[roleIndex]}</span>
             </h1>
             <p className={`ta-sub ta-hero-fade ${mounted ? "show" : ""}`} style={{ transitionDelay: "0.12s" }}>
-              I clean messy datasets, automate ETL pipelines, and build Power BI dashboards that cut reporting time by 30%.
-              From root-cause SQL deep-dives to AI-driven forecasting — I turn raw ops data into strategic decisions.
+              I build decision systems from messy operational data — automated pipelines, forecasting,
+              optimization, machine learning, and executive BI that move teams from reporting to action.
             </p>
             <div className={`ta-location-row ta-hero-fade ${mounted ? "show" : ""}`} style={{ transitionDelay: "0.15s" }}>
               <span><MapPin size={13} /> {person.location}</span>
               <span><Phone size={13} /> {person.phone}</span>
-              <span><Activity size={13} /> 9 projects delivered</span>
+              <span><Activity size={13} /> 3 flagship systems</span>
             </div>
             <div className={`ta-cta-row ta-hero-fade ${mounted ? "show" : ""}`} style={{ transitionDelay: "0.18s" }}>
               <button className="ta-btn-primary" onClick={() => handleNav("#projects")}>
@@ -1348,8 +1356,8 @@ export default function Portfolio() {
         <div className="ta-section-inner">
           <Reveal className="ta-section-head">
             <p className="ta-eyebrow">02 — TOOLKIT</p>
-            <h2 className="ta-h2 ta-serif">Toolkit, measured.</h2>
-            <p className="ta-h2-sub">The tools I reach for most, and roughly how deep that goes — rated against real project use, not a self-assessment quiz.</p>
+            <h2 className="ta-h2 ta-serif">Skills backed by shipped work.</h2>
+            <p className="ta-h2-sub">A practical toolkit demonstrated across production-style pipelines, predictive systems, optimization workflows, and executive dashboards.</p>
           </Reveal>
           <div className="ta-skills-grid">
             {skillGroups.map((group, gi) => (
@@ -1416,9 +1424,15 @@ export default function Portfolio() {
                 Analytics and building weekly dashboards for the marketing team.
               </p>
               <p>
-                I built <strong>TR-InsightForge</strong>, a BI platform combining ARIMA forecasting,
-                RFM/K-Means segmentation, and a RAG pipeline grounded in Groq Llama 3.3-70B —
-                giving small business owners enterprise-grade analytics without a data team.
+                My latest project is a <strong>Supply Chain Intelligence &amp; Demand Optimization Platform</strong>
+                built across 2,000 products and 1.46 million daily records. It combines data-quality controls,
+                demand forecasting, inventory optimization, economic validation, contingency planning,
+                executive action logic, and a DuckDB analytical warehouse in one reproducible pipeline.
+              </p>
+              <p>
+                I also built <strong>TR-InsightForge</strong>, a BI platform combining ARIMA forecasting,
+                RFM/K-Means segmentation, and a RAG business advisor, alongside a churn early-warning
+                system using Random Forest, SHAP explanations, and retention economics.
               </p>
 
               <div className="ta-edu-block">
